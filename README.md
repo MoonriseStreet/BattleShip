@@ -1,6 +1,6 @@
 # BattleShip ![alt text](https://github.com/MoonriseStreet/BattleShip/blob/master/BattleShip/pic/boat.png)
 
-Python project, made by [Lialikova Irina](https://github.com/lialikova-ia).
+Another Python project, made by me for my study.
 
 
 Describtion in https://github.com/lialikova-ia/Patterns/blob/patterns/описание.pdf
