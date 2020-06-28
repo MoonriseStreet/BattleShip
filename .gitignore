@@ -1,0 +1,11 @@
+*.xcf
+*.tex
+*.gz
+*.aux
+*.log
+
+
+*.idea/
+*__pycache__/
+
+*Test.py
