@@ -1,4 +1,4 @@
-# BattleShip ![alt text](https://github.com/lialikova-ia/Patterns/blob/master/BattleShip/pic/boat.png)
+# BattleShip ![alt text](https://github.com/MoonriseStreet/BattleShip/blob/master/BattleShip/pic/boat.png)
 
 Python project, made by [Lialikova Irina](https://github.com/lialikova-ia).
 
