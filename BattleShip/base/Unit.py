@@ -1,12 +1,12 @@
-import arcade
-from const import *
+from arcade import Sprite, load_texture
+from const import PLAYER_LOCATION_X, ENEMY_LOCATION_X, PLAYER_BASE_POSITION_X, ENEMY_BASE_POSITION_X
 
 
-class Unit(arcade.Sprite):
+class Unit(Sprite):
     def __init__(self, components: list):
-        self._components = components
-        arcade.Sprite.__init__(self, components[0])
-        self.dying_sprite = arcade.load_texture(components[1])
+        self.components = components
+        Sprite.__init__(self, components[0])
+        self.dying_sprite = load_texture(components[1])
         self.cost = components[2]
         self.max_hp = components[3]
         self.damage = components[4]
@@ -16,7 +16,13 @@ class Unit(arcade.Sprite):
         self.side = None
 
     def __repr__(self):
-        return self._components
+        return self.components
+
+    def get_cost(self):
+        return self.cost
+
+    def get_damage(self, points: int):
+        self.delta -= points
 
     def make_damage(self):
         if self.get_hp() >= self.blow_damage:
@@ -27,9 +33,9 @@ class Unit(arcade.Sprite):
     def get_hp(self):
         if self.side == 'player':
             lost = int(self.consumption * (self.center_x - PLAYER_LOCATION_X) /
-                       (BASE2_POSITION_X - PLAYER_LOCATION_X))
+                       (ENEMY_BASE_POSITION_X - PLAYER_LOCATION_X))
         else:
             lost = int(self.consumption * (self.center_x - ENEMY_LOCATION_X) /
-                       (BASE1_POSITION_X - ENEMY_LOCATION_X))
+                       (PLAYER_BASE_POSITION_X - ENEMY_LOCATION_X))
 
         return self.max_hp - lost + self.delta

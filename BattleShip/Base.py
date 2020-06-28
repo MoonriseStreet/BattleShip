@@ -1,5 +1,5 @@
 import arcade
-from const import *
+from const import MAX_BASE_HP, BAR_LENGTH, BAR_HEIGHT
 
 
 class Base(arcade.Sprite):

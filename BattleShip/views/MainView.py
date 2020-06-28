@@ -1,110 +1,103 @@
-import arcade
-from arcade.gui import *
-import const
+from arcade import (View, load_texture, SpriteList, start_render, draw_lrwh_rectangle_textured,
+                    draw_texture_rectangle, color, draw_text
+                    )
+from const import (MAIN_PIC, SCREEN_WIDTH, SCREEN_HEIGHT,
+                   BUTTON_X, BUTTON_Y, BUTTON_WIDTH, BUTTON_HEIGHT, BUTTON_DELAY,
+                   SHIPS_COUNT, SHIPS_NAME, SHIPS_IMAGE, SHIPS_COST, EXTRA_SUPPLY_COST, EXTRA_WEAPON_COST,
+                   PLAYER_LOCATION_X, PLAYER_LOCATION_Y, ENEMY_LOCATION_X, ENEMY_LOCATION_Y, FIGHTERS_SPEED,
+                   TIME_DELAY, BUTTON_FONT_SIZE
+                   )
 from Button import Button
-from Base import Base
 from DialogBox import DialogBox
-from builder.UnitBuilder import UnitBuilder
-from builder.FrigateUnitBuilder import FrigateUnitBuilder
-from builder.CruiserUnitBuilder import CruiserUnitBuilder
-from builder.BoatUnitBuilder import BoatUnitBuilder
+from decorator.SupplyDecorator import SupplyDecorator
+from decorator.WeaponDecorator import WeaponDecorator
 from Player import Player
-from Explosion import Explosion
+from Enemy import Enemy
+from SpriteManager import SpriteManager
+from views.DefeatView import DefeatView
+from views.WinView import WinView
 
 
-class MainView(arcade.Window):
+class MainView(View):
 
     def __init__(self):
-        super().__init__(const.SCREEN_WIDTH, const.SCREEN_HEIGHT,
-                         const.SCREEN_TITLE)
-
-        self.background = None
+        super().__init__()
         self.time = 0
         self.last_click = -1
         self.last_start = -1
-        self.explosion_texture = arcade.load_texture("pic/explosion.png")
 
         self.player = Player()
+        self.enemy = Enemy()
         self.dialog_box = DialogBox()
-        self.player_base = None
-        self.enemy_base = None
-        self.player_ships = None
-        self.enemy_ships = None
-        self.explosions_list = None
+        self.background = load_texture(MAIN_PIC)
+        self.sprite_manager = SpriteManager()
+        self.set_buttons()
+        self.sprite_manager.setup()
+        self.enemy.setup()
 
     def set_buttons(self):
-        for i in range(const.SHIPS_COUNT):
-            button = Button(const.BUTTON_X, const.BUTTON_Y[i],
-                            const.BUTTON_WIDTH[i], const.BUTTON_HEIGHT,
-                            const.SHIPS_NAME[i] + '\n' + str(
-                                const.SHIPS_COST[i]) + '$',
-                            const.SHIPS_NAME[i], 17)
-            button.cost = const.SHIPS_COST[i]
+        for i in range(SHIPS_COUNT):
+            button = Button(BUTTON_X, BUTTON_Y[i], BUTTON_WIDTH[i], BUTTON_HEIGHT,
+                            SHIPS_NAME[i] + '\n' + str(SHIPS_COST[i]) + '$', SHIPS_NAME[i], BUTTON_FONT_SIZE)
             self.button_list.append(button)
         self.button_list.append(self.dialog_box.supply_button)
         self.button_list.append(self.dialog_box.weapon_button)
         self.button_list.append(self.dialog_box.go_button)
 
-
-    def setup(self):
-        self.background = arcade.load_texture(const.MAIN_PIC)
-        self.set_buttons()
-        self.player_ships = arcade.SpriteList()
-        self.enemy_ships = arcade.SpriteList()
-        self.explosions_list = arcade.SpriteList()
-
-        self.player_base = Base(const.BASE1_POSITION_X, const.BASE1_POSITION_Y,
-                                const.BAR1_POSITION_X, const.BAR1_POSITION_Y)
-        self.enemy_base = Base(const.BASE2_POSITION_X, const.BASE2_POSITION_Y,
-                               const.BAR2_POSITION_X, const.BAR2_POSITION_Y)
-
     def on_draw(self):
-        arcade.start_render()
-        arcade.draw_lrwh_rectangle_textured(0, 0, const.SCREEN_WIDTH,
-                                            const.SCREEN_HEIGHT, self.background)
-        super().on_draw()
-        self.player.draw()
-        self.explosions_list.draw()
-        self.player_ships.draw()
-        self.enemy_ships.draw()
-        self.player_base.draw()
-        self.enemy_base.draw()
+        start_render()
+        draw_lrwh_rectangle_textured(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, self.background)
+
+        for button in self.button_list:
+            button.draw()
         self.dialog_box.draw()
+        self.sprite_manager.draw_sprites()
+        self.player.draw()
+
+    def on_update(self, delta_time):
+        new_ship = self.enemy.on_update(delta_time, self.sprite_manager.game_state())
+        if new_ship is not None:
+            self.sprite_manager.add_enemy_ship(new_ship)
+        self.sprite_manager.update(delta_time)
+        self.player.money_increase(self.sprite_manager.player_fight_benefit())
+        self.enemy.money_increase(self.sprite_manager.enemy_fight_benefit())
+        for i in range(SHIPS_COUNT):
+            if self.button_list[i].pressed:
+                self.dialog_box.curr = i
+                self.dialog_box.update()
+        self.update_buttons(delta_time)
+        self.time += delta_time
+
+        status = self.sprite_manager.check_end_game()
+        if status != 0:
+            final_view = DefeatView() if status == 1 else WinView()
+            self.window.show_view(final_view)
 
     def clone(self, number: int):
         self.player.set_builder(number)
         fighter = self.player.clone()
-        if self.player.money < fighter.cost:
+        if self.dialog_box.weapon_button.checked:
+            fighter = WeaponDecorator(fighter)
+        if self.dialog_box.supply_button.checked:
+            fighter = SupplyDecorator(fighter)
+        if self.player.money < fighter.get_cost():
             return
-        fighter.center_x = const.PLAYER_LOCATION_X
-        fighter.center_y = const.PLAYER_LOCATION_Y
-        fighter.change_x = const.FIGHTERS_SPEED
+        fighter.center_x = PLAYER_LOCATION_X
+        fighter.center_y = PLAYER_LOCATION_Y
+        fighter.change_x = FIGHTERS_SPEED
         fighter.side = 'player'
-        self.player_ships.append(fighter)
+        self.sprite_manager.add_ship(fighter)
         self.player.money_decrease(fighter.cost)
 
     def lock_buttons(self, button):
         button.locked = True
         self.last_click = self.time
 
-    def on_update(self, delta_time):
-        self.explosions_list.update()
-        self.player_base.update()
-        self.enemy_base.update()
-        self.player_ships.update()
-        self.enemy_ships.update()
-        self.check_ships(self.player_ships)
-        self.check_ships(self.enemy_ships)
-        self.check_collisions(self.player_ships, self.enemy_base)
-        self.check_collisions(self.enemy_ships, self.player_base)
-        for i in range(const.SHIPS_COUNT):
-            if self.button_list[i].pressed:
-                self.dialog_box.curr = i
-                self.dialog_box.update()
-        if self.dialog_box.supply_button.pressed and self.time > self.last_click + 20 * delta_time:
+    def update_buttons(self, delta_time):
+        if self.dialog_box.supply_button.pressed and self.time > self.last_click + TIME_DELAY * delta_time:
             self.last_click = self.time
             self.dialog_box.supply_button.checked = not self.dialog_box.supply_button.checked
-        if self.dialog_box.weapon_button.pressed and self.time > self.last_click + 20 * delta_time:
+        if self.dialog_box.weapon_button.pressed and self.time > self.last_click + TIME_DELAY * delta_time:
             self.last_click = self.time
             self.dialog_box.weapon_button.checked = not self.dialog_box.weapon_button.checked
         if self.dialog_box.go_button.pressed and not self.dialog_box.go_button.checked:
@@ -113,33 +106,23 @@ class MainView(arcade.Window):
             self.dialog_box.supply_button.checked = False
             self.dialog_box.weapon_button.checked = False
             self.last_start = self.time
-        if self.time > self.last_start + const.BUTTON_DELAY:
+        if self.time > self.last_start + BUTTON_DELAY:
             self.dialog_box.go_button.checked = False
-        if const.SHIPS_COST[self.dialog_box.curr] > self.player.money:
+        if SHIPS_COST[self.dialog_box.curr] > self.player.money:
             self.dialog_box.go_button.locked = True
-        if const.EXTRA_SUPPLY_COST > self.player.money:
+        else:
+            self.dialog_box.go_button.locked = False
+
+        if SHIPS_COST[self.dialog_box.curr] + EXTRA_SUPPLY_COST > self.player.money or \
+                self.dialog_box.weapon_button.checked and \
+                SHIPS_COST[self.dialog_box.curr] + EXTRA_WEAPON_COST + EXTRA_SUPPLY_COST > self.player.money:
             self.dialog_box.supply_button.locked = True
-        if const.EXTRA_WEAPON_COST > self.player.money:
+        else:
+            self.dialog_box.supply_button.locked = False
+
+        if SHIPS_COST[self.dialog_box.curr] + EXTRA_WEAPON_COST > self.player.money or \
+                self.dialog_box.supply_button.checked and \
+                SHIPS_COST[self.dialog_box.curr] + EXTRA_WEAPON_COST + EXTRA_SUPPLY_COST > self.player.money:
             self.dialog_box.weapon_button.locked = True
-        self.time += delta_time
-
-    def check_collisions(self, ships, base):
-        for ship in ships:
-            if arcade.check_for_collision(ship, base):
-                base.damage(ship.make_damage())
-                explosion = Explosion(self.explosion_texture)
-                explosion.center_x = base.center_x
-                explosion.center_y = base.center_y
-                explosion.update()
-                self.explosions_list.append(explosion)
-                ship.remove_from_sprite_lists()
-
-    def check_ships(self, ships):
-        for ship in ships:
-            if ship.get_hp() <= 0:
-                explosion = Explosion(ship.dying_sprite)
-                explosion.center_x = ship.center_x
-                explosion.center_y = ship.center_y
-                explosion.update()
-                self.explosions_list.append(explosion)
-                ship.remove_from_sprite_lists()
+        else:
+            self.dialog_box.weapon_button.locked = False

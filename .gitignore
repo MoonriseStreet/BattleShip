@@ -7,5 +7,6 @@
 
 *.idea/
 *__pycache__/
+*venv/
 
 *Test.py
