@@ -1,30 +1,98 @@
 # SCREEN PARAMETERS
+
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 SCREEN_TITLE = "BattleShip"
 
 # FIGHTERS PARAMETERS
-FIGHTERS_SPEED = 1
+
+FIGHTERS_SPEED = 1.5
+
 PLAYER_LOCATION_X = 120
 PLAYER_LOCATION_Y = 400
 
+ENEMY_LOCATION_X = 680
+ENEMY_LOCATION_Y = 400
+
+# SHIPS_PARAMETERS
+
+SHIPS_COUNT = 3
+SHIPS_NAME = ["boat", "frigate", "cruiser"]
+SHIPS_IMAGE = [
+    ["pic/boat.png", "pic/dying_boat.png"],
+    ["pic/frigate.png", "pic/dying_frigate.png"],
+    ["pic/cruiser.png", "pic/dying_cruiser.png"]
+]
+SHIPS_COST = [100, 200, 500]
+SHIPS_HP = [1000, 3000, 10000]
+SHIPS_DAMAGE = [100, 200, 500]
+SHIPS_BLOW_DAMAGE = [50, 50, 100]
+SHIPS_CONSUMPTION = [1400, 2000, 4000]
+
 # BUTTONS_PARAMETERS
 
-BUTTONS_COUNT = 3
-BUTTON_NAME = ["boat", "cruiser", "destroyer"]
 BUTTON_X = 105
-BUTTON_Y = [245, 160, 75]
-BUTTON_IMAGES = [["pic/boat_button.png", "pic/boat_button_hover.png"],
-                 ["pic/cruiser_button.png", "pic/cruiser_button_hover.png"],
-                 ["pic/destroyer_button.png", "pic/destroyer_button_hover.png"]]
-BUTTON_WIDTH = [60, 80, 80]
+BUTTON_Y = [248, 165, 75]
+BUTTON_WIDTH = [60, 90, 90]
+BUTTON_HEIGHT = 35
 BUTTON_DELAY = 1.5
 
 # BASES PARAMETERS
 
-BASE1_POSITION_X = 700
+BASE1_POSITION_X = 100
 BASE1_POSITION_Y = 400
+
+BASE2_POSITION_X = 700
+BASE2_POSITION_Y = 400
+
+MAX_BASE_HP = 2000
+
+# HEALTHBAR PARAMETERS
+
+BAR1_POSITION_X = 144
+BAR1_POSITION_Y = 326
+
+BAR2_POSITION_X = 660
+BAR2_POSITION_Y = 320
+
+BAR_LENGTH = 130
+BAR_HEIGHT = 18
+
+# DIALOG WINDOW PARAMETERS
+
+PICTURE_X = 290
+PICTURE_Y = 160
+PICTURE_SIZE = [
+    (80, 76), (108, 66), (135, 94)
+]
+
+TITLE_X = 260
+TITLE_Y = 77
+
+SUPPLY_X = 465
+SUPPLY_Y = 190
+
+WEAPON_X = 465
+WEAPON_Y = 130
+
+GO_X = 465
+GO_Y = 70
+
+DIALOG_BUTTON_WIDTH = 160
+DIALOG_BUTTON_HEIGHT = 50
+
+EXTRA_SUPPLY_COST = 20
+EXTRA_WEAPON_COST = 20
 
 # OTHER
 
+INIT_MONEY = 1000
+
 EXPLOSION_DURATION = 30
+
+MONEY_BAR_X = 245
+MONEY_BAR_Y = 245
+
+FONT_NAME = 'fonts/KGSecondChancesSolid.ttf'
+MAIN_PIC = "pic/mainView.png"
+EMPTY_PIC = 'pic/empty.png'

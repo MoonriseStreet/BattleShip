@@ -1,24 +1,32 @@
 from arcade.gui import *
+import const
+
 
 class Button(TextButton):
-    def __init__(self, game, type, x=0, y=0, width=100, height=40, text="", theme=None):
-        super().__init__(x, y, width, height, text, theme=theme)
-        self.theme = theme
-        self.type = type
-        self.game = game
+    def __init__(self, x, y, width, height, text, name, font_size):
+        theme = Theme()
+        theme.set_font(font_size, arcade.color.COOL_BLACK, font_name=const.FONT_NAME)
+        theme.add_button_textures(const.EMPTY_PIC)
+        super().__init__(x, y, width, height,
+                         text, theme=theme)
+        self.cost = None
+        self.name = name
         self.pressed = False
+        self.checked = False
         self.locked = False
 
     def on_press(self):
-        if not self.locked:
-            self.pressed = True
-            self.locked = True
+        self.pressed = True
 
     def on_release(self):
         self.pressed = False
 
     def draw_texture_theme(self):
         if self.locked:
-            arcade.draw_texture_rectangle(self.center_x, self.center_y, self.width, self.height, self.clicked_texture)
+            arcade.draw_texture_rectangle(self.center_x, self.center_y,
+                                          self.width, self.height,
+                                          self.clicked_texture)
         else:
-            arcade.draw_texture_rectangle(self.center_x, self.center_y, self.width, self.height, self.normal_texture)
+            arcade.draw_texture_rectangle(self.center_x, self.center_y,
+                                          self.width, self.height,
+                                          self.normal_texture)
