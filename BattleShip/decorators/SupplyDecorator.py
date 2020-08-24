@@ -1,4 +1,4 @@
-from decorator.Decorator import Decorator
+from decorators.Decorator import Decorator
 from const import CONSUMPTION_COEFFICIENT, SUPPLY_COEFFICIENT, EXTRA_SUPPLY_COST
 import copy
 

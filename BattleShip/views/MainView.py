@@ -9,8 +9,8 @@ from const import (MAIN_PIC, SCREEN_WIDTH, SCREEN_HEIGHT,
                    )
 from Button import Button
 from DialogBox import DialogBox
-from decorator.SupplyDecorator import SupplyDecorator
-from decorator.WeaponDecorator import WeaponDecorator
+from decorators.SupplyDecorator import SupplyDecorator
+from decorators.WeaponDecorator import WeaponDecorator
 from Player import Player
 from Enemy import Enemy
 from SpriteManager import SpriteManager

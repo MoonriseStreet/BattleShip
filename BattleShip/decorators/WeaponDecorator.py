@@ -1,4 +1,4 @@
-from decorator.Decorator import Decorator
+from decorators.Decorator import Decorator
 from const import (CONSUMPTION_COEFFICIENT, WEAPON_COEFFICIENT, EXTRA_WEAPON_COST)
 import copy
 

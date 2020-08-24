@@ -1,4 +1,4 @@
-from decorator.Decorator import Decorator
+from decorators.Decorator import Decorator
 import copy
 
 

@@ -1,4 +1,4 @@
-from decorator.ReverseDecorator import ReverseDecorator
+from decorators.ReverseDecorator import ReverseDecorator
 from Player import Player
 from base.Unit import Unit
 from strategy.RandomStrategy import RandomStrategy
